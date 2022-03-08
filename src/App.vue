@@ -1,30 +1,23 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+  <header-bar></header-bar>
+  <div class="container">
+    <router-view/>
   </div>
-  <router-view/>
 </template>
+<script>
+import { mapActions } from 'vuex';
+import HeaderBar from '@/components/HeaderBar.vue';
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+export default {
 
-#nav {
-  padding: 30px;
+  components: {
+    HeaderBar,
+  },
+  methods: {
+      ...mapActions(['LOAD_LOCAL_STORAGE'])
+  },
+  created() {
+    this.LOAD_LOCAL_STORAGE();
+  }
 }
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+</script>
