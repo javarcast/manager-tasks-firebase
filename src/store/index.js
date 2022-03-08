@@ -11,6 +11,7 @@ export default createStore({
       numberValue: 0,
     },
     user: null,
+    error: { type: null, message: null}
   },
   mutations: {
     SET_USER(state, payload) {
@@ -37,6 +38,20 @@ export default createStore({
     },
     SET_LOGOUT(state) {
       state.user=null;
+    },
+    SET_ERROR(state, payload) {
+      if(payload === null){
+        return state.error = { type: null, message:null}
+      }
+      if(payload === 'EMAIL_NOT_FOUND') {
+        return state.error = { type: 'email', message: 'Email no registrado'};
+      }
+      if(payload === 'INVALID_PASSWORD') {
+        return state.error = { type: 'password', message: 'Clave incorrecta!'};
+      }
+      if(payload === 'EMAIL_EXISTS') {
+        return state.error = { type: 'email', message: 'El Email ya esta registrado'};
+      }
     }
 
   },
@@ -62,9 +77,10 @@ export default createStore({
         const userData = await resp.json();
         if(userData.error) {
           console.error(userData.error);
-          return;
+          return commit('SET_ERROR', userData.error.message);
         }
         commit('SET_USER',userData);
+        commit('SET_ERROR', null);
         localStorage.setItem('user', JSON.stringify(userData));
         router.push('/');
         
@@ -85,11 +101,12 @@ export default createStore({
         const dataDB = await resp.json();
         if(dataDB.error) {
           console.error(dataDB.error)
-          return;
+          
+          return commit('SET_ERROR', dataDB.error.message);
         }
 
         commit('SET_USER', dataDB);
-
+        commit('SET_ERROR', null);
         localStorage.setItem('user', JSON.stringify(userData));
         router.push('/');
         return;
@@ -101,7 +118,6 @@ export default createStore({
       if(localStorage.getItem('user')) {
         commit('SET_USER', JSON.parse(localStorage.getItem('user')));
       } else {
-        console.log('erh')
         return commit('SET_USER', null);
       }
       try {
@@ -166,6 +182,9 @@ export default createStore({
       } catch (error) {
         console.error(error)
       }
+    },
+    CLEAR_ERROR({commit}) {
+      commit('SET_ERROR', null);
     }
   },
   getters: {
